@@ -1,0 +1,55 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: mfg-monitoring-api
+  labels:
+    app: mfg-monitoring-api
+spec:
+  replicas: 3
+  selector:
+    app: mfg-monitoring-api
+  template:
+    metadata:
+      labels:
+        app: mfg-monitoring-api
+    spec:
+      containers:
+        - name: mfg-monitoring-api
+          image: image-registry.openshift-image-registry.svc:5000/mfg-namespace/mfg-monitoring-api:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mfg-monitoring-api-service
+spec:
+  selector:
+    app: mfg-monitoring-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: mfg-monitoring-api-route
+spec:
+  to:
+    kind: Service
+    name: mfg-monitoring-api-service
+  tls:
+    termination: edge

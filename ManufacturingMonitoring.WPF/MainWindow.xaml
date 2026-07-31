@@ -1,0 +1,86 @@
+<Window x:Class="ManufacturingMonitoring.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ManufacturingMonitoring.WPF.ViewModels"
+        mc:Ignorable="d"
+        Title="Micron Manufacturing Monitoring - WPF Diagnostic Client" Height="700" Width="1100"
+        Background="#0F172A">
+    <Window.DataContext>
+        <local:MainViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#1E293B" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="SpaceBetween">
+                <StackPanel>
+                    <TextBlock Text="Micron Semiconductor Manufacturing Monitor" FontSize="22" FontWeight="Bold" Foreground="#F8FAFC"/>
+                    <TextBlock Text="Real-Time Equipment Telemetry &amp; Diagnostic Diagnostics (ADO.NET / .NET 8 WPF)" FontSize="13" Foreground="#94A3B8" Margin="0,4,0,0"/>
+                </StackPanel>
+                <Button Content="🔄 Refresh Data" Width="140" Height="36" Background="#38BDF8" Foreground="#0F172A" FontWeight="Bold" Click="RefreshButton_Click" Cursor="Hand"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Summary KPI Cards -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="#1E293B" CornerRadius="6" Padding="16" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="Total Monitored Nodes" FontSize="13" Foreground="#94A3B8"/>
+                    <TextBlock Text="{Binding TotalNodesCount}" FontSize="28" FontWeight="Bold" Foreground="#38BDF8"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="#1E293B" CornerRadius="6" Padding="16" Margin="4,0,4,0">
+                <StackPanel>
+                    <TextBlock Text="Healthy Nodes" FontSize="13" Foreground="#94A3B8"/>
+                    <TextBlock Text="{Binding HealthyNodesCount}" FontSize="28" FontWeight="Bold" Foreground="#4ADE80"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Background="#1E293B" CornerRadius="6" Padding="16" Margin="8,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Warning / Critical Nodes" FontSize="13" Foreground="#94A3B8"/>
+                    <TextBlock Text="{Binding WarningNodesCount}" FontSize="28" FontWeight="Bold" Foreground="#F87171"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Data Grid View -->
+        <Border Grid.Row="2" Background="#1E293B" CornerRadius="8" Padding="12">
+            <DataGrid ItemsSource="{Binding NodeMetrics}" AutoGenerateColumns="False" 
+                      IsReadOnly="True" Background="Transparent" RowBackground="#0F172A" 
+                      AlternatingRowBackground="#1E293B" Foreground="#F8FAFC" GridLinesVisibility="None"
+                      HeaderStyle="{StaticResource {x:Type DataGridColumnHeader}}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Node ID" Binding="{Binding NodeId}" Width="140"/>
+                    <DataGridTextColumn Header="Machine Name" Binding="{Binding NodeName}" Width="250"/>
+                    <DataGridTextColumn Header="CPU Usage (%)" Binding="{Binding CpuUsagePercent, StringFormat={}{0:N1}%}" Width="130"/>
+                    <DataGridTextColumn Header="Memory (MB)" Binding="{Binding MemoryUsageMb, StringFormat={}{0:N0} MB}" Width="130"/>
+                    <DataGridTextColumn Header="Temp (°C)" Binding="{Binding TemperatureCelsius, StringFormat={}{0:N1}°C}" Width="110"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="110"/>
+                    <DataGridTextColumn Header="Last Telemetry Timestamp" Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Footer Bar -->
+        <Border Grid.Row="3" Margin="0,12,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#94A3B8" HorizontalAlignment="Right"/>
+        </Border>
+    </Grid>
+</Window>

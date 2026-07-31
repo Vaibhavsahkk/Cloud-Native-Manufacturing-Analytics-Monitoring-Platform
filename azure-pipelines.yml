@@ -1,0 +1,25 @@
+# Azure DevOps & TFS CI/CD Pipeline Configuration
+trigger:
+- main
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+
+- script: dotnet restore ManufacturingMonitoring.API/ManufacturingMonitoring.API.csproj
+  displayName: 'Restore NuGet Packages'
+
+- script: dotnet build ManufacturingMonitoring.API/ManufacturingMonitoring.API.csproj --configuration $(buildConfiguration)
+  displayName: 'Build .NET 8 WebAPI'
+
+- script: dotnet test ManufacturingMonitoring.Tests/ManufacturingMonitoring.Tests.csproj --configuration $(buildConfiguration)
+  displayName: 'Execute xUnit Test Suite'

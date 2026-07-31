@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mfg-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sql-server;Database=MfgMonitoringDb;User Id=sa;Password=YourStrong@Password123!;TrustServerCertificate=True;
+      - MongoDbSettings__ConnectionString=mongodb://mongo-db:27017
+      - MongoDbSettings__DatabaseName=ManufacturingMetrics
+    depends_on:
+      - sql-server
+      - mongo-db
+
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Password123!
+    ports:
+      - "1433:1433"
+
+  mongo-db:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+
+  mfg-dashboard:
+    build:
+      context: ./manufacturing-monitoring-dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - mfg-api
