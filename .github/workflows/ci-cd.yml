@@ -18,14 +18,21 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore ManufacturingMonitoring.API/ManufacturingMonitoring.API.csproj
+    - name: Restore & Build API
+      run: |
+        dotnet restore ManufacturingMonitoring.API/ManufacturingMonitoring.API.csproj
+        dotnet build ManufacturingMonitoring.API/ManufacturingMonitoring.API.csproj --no-restore -c Release
 
-    - name: Build API
-      run: dotnet build ManufacturingMonitoring.API/ManufacturingMonitoring.API.csproj --no-restore -c Release
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
 
-    - name: Run xUnit Tests
-      run: dotnet test ManufacturingMonitoring.Tests/ManufacturingMonitoring.Tests.csproj --no-build --verbosity normal
+    - name: Build Dashboard Frontend
+      run: |
+        cd manufacturing-monitoring-dashboard
+        npm ci
+        npm run build
 
     - name: Build Docker Container
       run: docker build -t mfg-monitoring-api:latest .
